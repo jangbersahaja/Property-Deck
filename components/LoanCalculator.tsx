@@ -281,7 +281,7 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
         </form>
       </div>
       {showOther === true && (
-        <div className="m-5 rounded-xl overflow-hidden shadow-xl cursor-pointer bg-slate-200 dark:bg-slate-600">
+        <div className="m-5 max-w-lg  rounded-xl overflow-hidden shadow-xl cursor-pointer bg-slate-200 dark:bg-slate-600">
           <div className="flex p-5 bg-slate-700 text-white rounded-t-xl">
             <h2 className="ml-2 text-lg font-bold">Other Fees</h2>
           </div>
