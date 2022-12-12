@@ -143,12 +143,30 @@ const LoanCalculator = () => {
     const bt = Number(downpayment.replace(/,/g, '')) + t
 
     setFee({
-      spaLawyer: x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-      dutyStamp: y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-      loanLawyer: z.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-      loanStamp: s.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-      totalFee: t.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
-      totalDownpayment: bt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      spaLawyer: x
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      dutyStamp: y
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      loanLawyer: z
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      loanStamp: s
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      totalFee: t
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+      totalDownpayment: bt
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ','),
     })
   }
 
@@ -162,7 +180,7 @@ const LoanCalculator = () => {
           <div className="p-5 grid gap-5 md:grid-cols-2  ">
             <label className="block">
               <span className="block text-sm font-medium">
-                Propery Price (RM)
+                Property Price (RM)
               </span>
               <input
                 type="text"
@@ -281,43 +299,57 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
         </form>
       </div>
       {showOther === true && (
-        <div className="m-5 max-w-lg  rounded-xl overflow-hidden shadow-xl cursor-pointer bg-slate-200 dark:bg-slate-600">
+        <div className="m-5 max-w-lg  rounded-xl overflow-hidden shadow-xl bg-slate-200 dark:bg-slate-600">
           <div className="flex p-5 bg-slate-700 text-white rounded-t-xl">
-            <h2 className="ml-2 text-lg font-bold">Other Fees</h2>
+            <h2 className="ml-2 text-lg font-bold">Legal Fees & Stamp Duty</h2>
           </div>
-          <div className="p-5 grid gap-5">
-            <div className="mb-3">
-              <h4>Sale & Purchase Agreement:</h4>
+          <div className="p-5 grid gap-7">
+            <div>
+              <h4>Sale & Purchase Agreement Costs:</h4>
               <div className="my-3">
-                <h5 className="text-xs">Lawyer Fee:</h5>
-                <h4 className="text-sm font-medium ">RM{fee.spaLawyer}</h4>
+                <h5 className="text-xs">SPA Legal Fee:</h5>
+                <h4 className="text-md font-medium ">RM{fee.spaLawyer}</h4>
               </div>
               <div>
-                <h5 className="text-xs">Stamp Duty Fee:</h5>
-                <h4 className="text-sm font-medium ">RM{fee.dutyStamp}</h4>
+                <h5 className="text-xs">SPA Stamp Duty:</h5>
+                <h4 className="text-md font-medium">
+                  RM{fee.dutyStamp}
+                  {Number(userValues.price.replace(/,/g, '')) < 1000001 && (
+                    <span className="text-xs"> *Skim I-Miliki</span>
+                  )}
+                </h4>
               </div>
             </div>
             <div>
-              <h4>Loan Agreement:</h4>
-              <div className="mb-3 flex">
+              <h4>Loan Documentation Costs:</h4>
+              <div className="flex">
                 <input type="checkbox" name="includeLoan" id="" />
                 <label htmlFor="" className="ml-3 text-xs">
                   Inlude Fees in Loan
                 </label>
               </div>
               <div className="my-3">
-                <h5 className="text-xs">Lawyer Fee:</h5>
-                <h4 className="text-sm font-medium ">RM{fee.loanLawyer}</h4>
+                <h5 className="text-xs">Loan Documentation Legal Fee:</h5>
+                <h4 className="text-md font-medium ">RM{fee.loanLawyer}</h4>
               </div>
               <div>
-                <h5 className="text-xs">Agreement Stamp Duty:</h5>
-                <h4 className="text-sm font-medium ">RM{fee.loanStamp}</h4>
+                <h5 className="text-xs">Loan Documentation Stamp Duty:</h5>
+                <h4 className="text-md font-medium ">RM{fee.loanStamp}</h4>
               </div>
             </div>
-          </div>
-          <div className="p-5">
-            <h3 className="text-md font-medium">Total Payment:</h3>
-            <h1 className="text-4xl font-medium">RM{fee.totalFee}</h1>
+            <div>
+              <h4>Other Costs:</h4>
+              <div className="my-3">
+                <h5 className="text-xs">Downpayment:</h5>
+                <h4 className="text-md font-medium ">
+                  RM{userValues.downpayment}.00
+                </h4>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-md font-medium">Total Payment:</h3>
+              <h1 className="text-4xl font-medium">RM{fee.totalDownpayment}</h1>
+            </div>
           </div>
         </div>
       )}
