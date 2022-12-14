@@ -15,8 +15,55 @@ const LoanCalculator = () => {
     rate: '3.5',
   })
 
+  const [financeValue, setFinanceValue] = useState(
+    ((Number(userValues.price.replace(/,/g, '')) -
+      Number(userValues.downpayment.replace(/,/g, ''))) /
+      Number(userValues.price.replace(/,/g, ''))) *
+      100
+  )
+
+  const handleFinanceValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const finance = Number(event.target.value)
+
+    setFinanceValue(finance)
+
+    const dp = (
+      Number(userValues.price.replace(/,/g, '')) -
+      (Number(userValues.price.replace(/,/g, '')) * finance) / 100
+    )
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+    setUserValues({ ...userValues, downpayment: dp })
+  }
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value
+      .replace(/\D/g, '')
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     setUserValues({ ...userValues, [event.target.name]: event.target.value })
+
+    if (event.target.name === 'downpayment') {
+      const x = Number(event.target.value.replace(/,/g, ''))
+
+      const y =
+        ((Number(userValues.price.replace(/,/g, '')) - x) /
+          Number(userValues.price.replace(/,/g, ''))) *
+        100
+
+      setFinanceValue(y)
+    }
+
+    if (event.target.name === 'price') {
+      const x = Number(event.target.value.replace(/,/g, ''))
+
+      const y =
+        ((x - Number(userValues.downpayment.replace(/,/g, ''))) /
+          Number(userValues.price.replace(/,/g, ''))) *
+        100
+
+      setFinanceValue(y)
+    }
   }
 
   const handleSubmitValues = (e: React.FormEvent<HTMLFormElement>) => {
@@ -186,41 +233,51 @@ const LoanCalculator = () => {
                 type="text"
                 name="price"
                 inputMode="decimal"
+                min={5}
+                maxLength={11}
                 pattern="[0-9,\.]+"
-                min="50000"
-                max="10000000"
-                data-validate-number
+                required={true}
                 value={userValues.price}
-                onFocus={(e) => (e.target.value = '')}
-                onBlur={(e) => (e.target.value = userValues.price)}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-invalid:border-pink-500 invalid:text-pink-600
-focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
+                className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </label>
-            <label className="block">
-              <span className="block text-sm font-medium">
-                Downpayment (RM)
-              </span>
-              <input
-                type="text"
-                name="downpayment"
-                inputMode="decimal"
-                pattern="[0-9,\.]+"
-                value={userValues.downpayment}
-                onFocus={(e) => (e.target.value = '')}
-                onBlur={(e) => (e.target.value = userValues.downpayment)}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-invalid:border-pink-500 invalid:text-pink-600
-focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
-              />
-            </label>
+            <div className="grid grid-cols-2 gap-10">
+              <label
+                htmlFor="minmax-range"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                <span className="block text-sm font-medium">
+                  Margin of Finance: {`${financeValue.toFixed(0)}` + '%'}
+                </span>
+                <input
+                  id="minmax-range"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step={1}
+                  onChange={handleFinanceValue}
+                  value={financeValue}
+                  className="w-full mt-5 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                />
+              </label>
+              <label className="block">
+                <span className="block text-sm font-medium">
+                  Downpayment (RM)
+                </span>
+                <input
+                  type="text"
+                  name="downpayment"
+                  min={4}
+                  maxLength={11}
+                  pattern="[0-9,\.]+"
+                  value={userValues.downpayment}
+                  onChange={handleInputChange}
+                  className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                />
+              </label>
+            </div>
+
             <label className="block">
               <span className="block text-sm font-medium">
                 Loan Period (Years)
@@ -231,14 +288,9 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
                 inputMode="decimal"
                 pattern="[0-9,\.]+"
                 value={userValues.period}
-                onFocus={(e) => (e.target.value = '')}
-                onBlur={(e) => (e.target.value = userValues.period)}
+                required={true}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-invalid:border-pink-500 invalid:text-pink-600
-focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
+                className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </label>
             <label className="block">
@@ -251,14 +303,9 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
                 inputMode="decimal"
                 pattern="[0-9,\.]+"
                 value={userValues.rate}
-                onFocus={(e) => (e.target.value = '')}
-                onBlur={(e) => (e.target.value = userValues.rate)}
+                required={true}
                 onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500
-disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-invalid:border-pink-500 invalid:text-pink-600
-focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
+                className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </label>
           </div>
@@ -267,7 +314,7 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
               <div>
                 <h5 className="text-xs">Loan Amount:</h5>
                 <h4 className="text-sm font-medium ">
-                  RM{results.loanAmount}.00
+                  RM{results.loanAmount && results.loanAmount + '.00'}
                 </h4>
               </div>
               <div>
@@ -323,7 +370,12 @@ focus:invalid:border-pink-500 focus:invalid:ring-pink-500"
             <div>
               <h4>Loan Documentation Costs:</h4>
               <div className="flex">
-                <input type="checkbox" name="includeLoan" id="" />
+                <input
+                  type="checkbox"
+                  name="includeLoan"
+                  id=""
+                  className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                />
                 <label htmlFor="" className="ml-3 text-xs">
                   Inlude Fees in Loan
                 </label>
